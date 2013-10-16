@@ -1,0 +1,73 @@
+{
+  "name": "meany",
+  "description": "a MEAN stack",
+  "version": "0.0.3",
+  "private": true,
+  "author": {
+    "name": "Ryan Lindgren",
+    "email": "ryan.lindgren@gmail.com",
+    "url": "http://www.ryanlindgren.com/"
+  },
+  "engines": {
+    "node": "0.10.x",
+    "npm": "1.2.x"
+  },
+  "scripts": {
+    "start": "NODE_ENV=development ./node_modules/.bin/forever -m 5 server.js",
+    "test": "NODE_ENV=test ./node_modules/.bin/jasmine-node --color specs/**",
+    "postinstall": "node_modules/bower/bin/bower install"
+  },
+  "dependencies": {
+    "express": "latest",
+    "jade": "latest",
+    "mongoose": "*",
+    "socket.io": "*",
+    "connect-mongo": "*",
+    "passport": "*",
+    "passport-local": "latest",
+    "passport-facebook": "latest",
+    "passport-twitter": "latest",
+    "passport-github": "latest",
+    "passport-google-oauth": "latest",
+    "underscore": "latest",
+    "async": "latest",
+    "bower": "*",
+    "forever": "*",
+    "q": "~0.9.7"
+  },
+  "devDependencies": {
+    "forever": "~0.10.8",
+    "express-debug": "~1.0.3",
+    "mocha": "*",
+    "should": "*",
+    "assert": "*",
+    "supertest": "*",
+    "karma": "~0.10",
+    "karma-ng-scenario": "~0.1",
+    "karma-safari-launcher": "~0.1.1",
+    "jasmine-node": "~1.4.0",
+    "phantomjs": "~1.9.2-1",
+    "grunt": "~0.4.1",
+    "grunt-shell": "~0.4.0",
+    "grunt-nodemon": "0.1.1",
+    "grunt-concurrent": "~0.3.1",
+    "grunt-karma": "~0.6.1",
+    "grunt-jade": "~0.4.0",
+    "grunt-jasmine-node": "*",
+    "grunt-contrib-coffee": "latest",
+    "grunt-contrib-htmlmin": "~0.1.3",
+    "grunt-contrib-cssmin": "~0.6.1",
+    "grunt-contrib-imagemin": "~0.3.0",
+    "grunt-contrib-csslint": "~0.1.2",
+    "grunt-contrib-copy": "~0.4.1",
+    "grunt-contrib-sass": "~0.5.0",
+    "grunt-contrib-compass": "latest",
+    "grunt-contrib-concat": "latest",
+    "grunt-contrib-watch": "~0.5.3",
+    "grunt-contrib-jshint": "~0.6.4",
+    "grunt-contrib-uglify": "~0.2.4",
+    "grunt-contrib-jasmine": "~0.5.2",
+    "grunt-contrib-requirejs": "~0.4.1",
+    "grunt-contrib-clean": "~0.5.0"
+  }
+}

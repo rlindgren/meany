@@ -1,0 +1,33 @@
+.alert-header {
+	position: relative;
+	left: 0;
+	right: 0;
+	top: 50px;
+	margin: 0;
+	background-color: purple;
+	color: white;
+	display: block;
+}
+
+.alert-header.ng-hide-add,
+.alert-header.ng-hide-remove {
+	-webkit-transition: all ease 0.5s;
+	-moz-transition: all ease 0.5s;
+	-o-transition: all ease 0.5s;
+	transition: all ease 0.5s;
+	display: block !important;
+}
+
+.alert-header.ng-hide-remove,
+.alert-header.ng-hide-add.ng-hide-add-active {
+	line-height: 0;
+	top:0;
+	opacity:0;
+}
+
+.alert-header.ng-hide-add,
+.alert-header.ng-hide-remove.ng-hide-remove-active {
+	line-height: 22px;
+	top:50px;
+	opacity:1;
+}

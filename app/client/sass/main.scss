@@ -1,0 +1,30 @@
+.pad-none {
+	padding: 0;
+}
+
+.margin-none {
+	margin: 0;
+}
+
+.pad-sm {
+	padding: 5px;
+}
+
+.pad-md {
+	padding: 10px;
+}
+
+.pad-lg {
+	padding: 15px;
+}
+
+.pad-xl {
+	padding: 20px;
+}
+
+.content {
+	position: relative;
+	top: 50px;
+}
+
+@import 'error-alert';

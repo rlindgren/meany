@@ -1,0 +1,22 @@
+.row
+  .col-12
+    form.navbar-form.navbar-right(role="form", data-ng-submit="signup(user)")
+      span(data-ng-bind="message")
+      br
+      .form-group
+        label.sr-only(for="name") Name
+        input.form-control(type="name", required, data-ng-model="user.name", placeholder="Name")
+      .form-group
+        label.sr-only(for="username") Username
+        input.form-control(type="username", required, data-ng-model="user.username", placeholder="Username")
+      .form-group
+        label.sr-only(for="email") Email address
+        input.form-control(type="email", required, data-ng-model="user.email", placeholder="Email")
+      .form-group
+        label.sr-only(for="password") Password
+        input.form-control(type="password", required, data-ng-model="user.password", placeholder="Password")
+      .checkbox
+        label
+          input(type="checkbox", data-ng-model="user.remember")
+          |  Remember me
+      button.btn.btn-default(type="submit") Sign up

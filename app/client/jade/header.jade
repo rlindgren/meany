@@ -1,0 +1,25 @@
+header.navbar.navbar-fixed-top.navbar-default(role="banner", data-ng-controller="headerCtrl")
+  .navbar-header
+    button.navbar-toggle(type="button", data-toggle="collapse", data-target=".bs-navbar-collapse")
+      span.sr-only Toggle navigation
+      span.icon-bar
+      span.icon-bar
+      span.icon-bar
+    a.navbar-brand(href="/") {{appName}}
+  nav.collapse.navbar-collapse.bs-navbar-collapse(role="navigation")
+    ul.nav.navbar-nav
+      li(data-ng-repeat="item in menu", data-ng-show="session.user.name", ng-class="isSelected(item)")
+        a(href="{{item.link}}") {{item.title}}
+    ul.nav.navbar-nav.navbar-right(data-ng-hide="session.user.name")
+      li
+        a(href="/signup") Signup
+      li
+        a(href="/signin") Signin
+    ul.nav.navbar-nav.navbar-right(data-ng-show="session.user.name")
+      li.dropdown
+        a.dropdown-toggle(href="#", data-toggle="dropdown")
+          {{session.user.name}}
+          b.caret
+        ul.dropdown-menu
+          li
+            a(href="", data-ng-click="signout()") Signout
