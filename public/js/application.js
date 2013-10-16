@@ -80,6 +80,8 @@ angular.module('meany.auth').directive('errorAlert', function () {
 		}]
 	};
 });
+// Source: /Users/lindgrenryan/stack/meany/app/client/angular/filters/index.js
+
 // Source: /Users/lindgrenryan/stack/meany/app/client/angular/init.js
 
 $(document).ready(function() {

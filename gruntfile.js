@@ -230,7 +230,8 @@ module.exports = function(grunt) {
 
     jasmine_node: {
       specNameMatcher: "./spec", // load only specs containing specNameMatcher
-      specFolders: ['<%= paths.serverSpecsDir %>'],
+      projectRoot: "<%= paths.root %>",
+      specFolders: '<%= paths.serverSpecsDir %>',
       requirejs: false,
       forceExit: false
     },
@@ -291,7 +292,7 @@ module.exports = function(grunt) {
     'jade:html',
     'compass',
     'concat:deps', 'concat:js', 'concat:css',
-    'sass:bootstrap', 'sass:min',
+    'sass:bootstrap',
     'jshint',
     'jasmine_node',
     'concurrent'
