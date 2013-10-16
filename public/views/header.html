@@ -1,0 +1,22 @@
+
+<header role="banner" data-ng-controller="headerCtrl" class="navbar navbar-fixed-top navbar-default">
+  <div class="navbar-header">
+    <button type="button" data-toggle="collapse" data-target=".bs-navbar-collapse" class="navbar-toggle"><span class="sr-only">Toggle navigation</span><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button><a href="/" class="navbar-brand">{{appName}}</a>
+  </div>
+  <nav role="navigation" class="collapse navbar-collapse bs-navbar-collapse">
+    <ul class="nav navbar-nav">
+      <li data-ng-repeat="item in menu" data-ng-show="session.user.name" ng-class="isSelected(item)"><a href="{{item.link}}">{{item.title}}</a></li>
+    </ul>
+    <ul data-ng-hide="session.user.name" class="nav navbar-nav navbar-right">
+      <li><a href="/signup">Signup</a></li>
+      <li><a href="/signin">Signin</a></li>
+    </ul>
+    <ul data-ng-show="session.user.name" class="nav navbar-nav navbar-right">
+      <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">{{session.user.name}}<b class="caret"></b></a>
+        <ul class="dropdown-menu">
+          <li><a href="" data-ng-click="signout()">Signout</a></li>
+        </ul>
+      </li>
+    </ul>
+  </nav>
+</header>
