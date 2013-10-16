@@ -1,10 +1,10 @@
 // fire up server and connect socket
 var app = require('express')()
-  ,	passport = require('passport')
-  ,	server = require('http').createServer(app)
-	,	io = require('socket.io').listen(server)
-	, config = require('./config')
-	, serverBootstrap = require(config.paths.server.bootstrap);
+  , passport = require('passport')
+  , server = require('http').createServer(app)
+  , io = require('socket.io').listen(server)
+  , config = require('./config')
+  , serverBootstrap = require(config.paths.server.bootstrap);
 
 // bootstrap app via config pipeline
 serverBootstrap(app, passport, io, config);
