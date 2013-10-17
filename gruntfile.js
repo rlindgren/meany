@@ -229,11 +229,11 @@ module.exports = function(grunt) {
     },
 
     jasmine_node: {
-      specNameMatcher: "./spec", // load only specs containing specNameMatcher
-      projectRoot: "<%= paths.root %>",
-      specFolders: '<%= paths.serverSpecsDir %>',
+      specNameMatcher: "spec", // load only specs containing specNameMatcher
+      projectRoot: "<%= paths.serverSpecsDir %>/",
+      testDir: '<%= paths.serverSpecsDir %>',
       requirejs: false,
-      forceExit: false
+      forceExit: true
     },
 
     karma: {
