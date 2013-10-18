@@ -1,5 +1,6 @@
 var paths = require('./paths')
-	, path = require('path');
+	, path = require('path')
+	,	fs = require('fs');
 
 module.exports = {
 	"deps": [
@@ -26,16 +27,27 @@ module.exports = {
 		path.join(paths.libDir, '/sass-bootstrap/dist/js/bootstrap.min.js'),
 		path.join(paths.libDir, '/underscore/underscore.min.js')
   ],
-  "angular": [
-		path.join(paths.angularDir, '/**/*.js')
-  ],
-  "server": [
-		path.join(paths.serverDir, '/**/*.js'),
-  ],
-  "css": [
-		path.join(paths.cssDir, '/tmp/**/*.css')
-	],
-	"fonts": [
-		path.join(paths.fontsDir)
-	]
+  "angular": filesByExt(paths.angularDir, '.js'),
+  "server": filesByExt(paths.serverDir, '.js'),
+  "css": filesByExt(paths.cssDir + '/tmp', '.css'),
+	"fonts": filesByExt(paths.fontsDir)
+}
+
+function filesByExt (basePath, extname) {
+	files = [];
+	if (extname) {
+		extname = extname[0] === '.' ? extname : '.' + extname;
+	}
+	(function loop (fpath) {
+		fs.readdirSync(fpath).forEach(function (p) {
+			pp = path.join(fpath, p)
+			extMatch = extname ? path.extname(p) === extname : true
+			if (fs.lstatSync(pp).isDirectory()) {
+				loop(pp);
+			} else if ((p[0] !== '.' || p[1] !== '.') && extMatch) {
+				files.push(pp);
+			}
+		});
+	})(basePath);
+	return files;
 }

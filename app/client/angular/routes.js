@@ -1,8 +1,8 @@
 
 
-angular.module('meany.routes')
+angular.module('meany.router')
 
-.run(['Auth', 'Router', '$q', function (Auth, Router, $q) {
+.run(['Auth', 'Router', function (Auth, Router) {
   // restore user session to client or create anonymous guest profile
   Auth.restoreSession()
 

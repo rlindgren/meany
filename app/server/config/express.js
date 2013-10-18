@@ -5,6 +5,9 @@ var express = require('express')
 module.exports = function(app, passport, config) {
 	app.set('showStackError', true);
 
+	// simulate latency on server hits
+	app.use(middleware.simulateLatency());
+
 	app.use(express.logger('tiny'));
 
 	// call before express.static
@@ -47,7 +50,6 @@ module.exports = function(app, passport, config) {
 	// set favicon and static directory
 	app.use(express.favicon());
 	app.use(express.static(config.paths.publicDir));
-
 
 	// send status 500, unless error, then send 404
 	app.use(function (err, req, res, next) {

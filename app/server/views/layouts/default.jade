@@ -3,7 +3,7 @@ html(lang='en', xmlns='http://www.w3.org/1999/xhtml', xmlns:fb='https://www.face
 	include ../includes/head
 	body
 		div(data-ng-include="'views/header.html'")
-		error-alert(data-ng-show="errmsg", class="alert-header pad-md lead margin-none")
-		section.content.pad-xl
+		section.content
+			error-alert(data-ng-show="errmsg", class="alert-header pad-md lead")
 			block content
 		include ../includes/foot

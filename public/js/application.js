@@ -2,10 +2,10 @@
 // Source: /Users/lindgrenryan/stack/meany/app/client/angular/app.js
 angular.module('meany', [
 	'ngCookies', 'ngResource', 'ngAnimate',
-	'meany.routes', 'meany.io', 'meany.state', 'meany.auth'
+	'meany.router', 'meany.io', 'meany.state', 'meany.auth'
 ]);
 angular.module('meany.state', []);
-angular.module('meany.routes', ['ngRoute']);
+angular.module('meany.router', ['ngRoute']);
 angular.module('meany.io', []);
 angular.module('meany.auth', []);
 // Source: /Users/lindgrenryan/stack/meany/app/client/angular/config.js
@@ -94,9 +94,9 @@ $(document).ready(function() {
 // Source: /Users/lindgrenryan/stack/meany/app/client/angular/routes.js
 
 
-angular.module('meany.routes')
+angular.module('meany.router')
 
-.run(['Auth', 'Router', '$q', function (Auth, Router, $q) {
+.run(['Auth', 'Router', function (Auth, Router) {
   // restore user session to client or create anonymous guest profile
   Auth.restoreSession()
 
@@ -171,74 +171,84 @@ angular.module('meany.auth')
 .factory('Auth', [
 	'$q', '$http', '$cookieStore', '$location', 'Session',
 function ($q, $http, $cookieStore, $location, Session) {
+	/**
+	 * restore state after authentication action and redirect to index path ('/')
+	 * @param  {Object} data [Server response object]
+	 * @return void
+	 */
+	var _restoreState = function _restoreState (response) {
+		if (!response.data.errors) {
+			$cookieStore.put('user', response.data.user);
+			Session.user = response.data.user;
+			$location.path('/');
+		}
+	};
+
+	/**
+	 * sets Session and cookie user
+	 * @param {Object} serverResponse [Object returned from server]
+	 * @return void
+	 */
+	var _setCurrentUser = function _setCurrentUser (s, deferred) {
+		// `Session.user`'s state is known until this method is called in `routes.js`.
+		// This happens during the `run` phase of app init or app state restore.
+		var u = $cookieStore.get('user') || Session.user;
+		if (u.username && s.data.user.username && u.username === s.data.user.username) {
+			Session.user = u;
+		} else {
+			$cookieStore.put('user', s.data.user);
+			Session.user = s.data.user;
+		}
+		deferred.resolve();
+	};
+
 	return {
+
 		signup: function (userObject) {
-			var self = this;
 			var deferred = $q.defer();
 			$http.post('/api/users', userObject)
-			.then(function (response) { self._restoreState(response); });
+			.then(function (response) { _restoreState(response); });
 			return deferred.promise;
 		},
 
 		signin: function (credentials) {
-			var self = this;
 			var deferred = $q.defer();
 			$http.post('/auth/signin', credentials)
-			.then(function (response) { self._restoreState(response); });
+			.then(function (response) { _restoreState(response); });
 			return deferred.promise;
 		},
 
 		signout: function () {
-			var self = this;
 			var deferred = $q.defer();
 			$http.get('/auth/signout')
-			.then(function (response) { self._restoreState(response); });
+			.then(function (response) { _restoreState(response); });
 			return deferred.promise;
 		},
 
 		restoreSession: function () {
-			var self = this;
 			var deferred = $q.defer();
-			$http.get('/auth/user').then(function (response) {
-				self._setCurrentUser(response, deferred);
-			});
+			$http.get('/auth/user')
+			.then(function (response) { _setCurrentUser(response, deferred); });
 			return deferred.promise;
-		},
-
-		/**
-		 * restore state after authentication action and redirect to index path ('/')
-		 * @param  {Object} data [Server response object]
-		 * @return void
-		 */
-		_restoreState: function (response) {
-			if (!response.data.errors) {
-				$cookieStore.put('user', response.data.user);
-				Session.user = response.data.user;
-				$location.path('/');
-			}
-		},
-
-		/**
-		 * sets Session and cookie user
-		 * @param {Object} serverResponse [Object returned from server]
-		 * @return void
-		 */
-		_setCurrentUser: function (s, deferred) {
-			// `Session.user`'s state is known until this method is called in `routes.js`.
-			// This happens during the `run` phase of app init or app state restore.
-			var u = $cookieStore.get('user') || Session.user;
-			if (u.username && s.data.user.username && u.username === s.data.user.username) {
-				Session.user = u;
-			} else {
-				$cookieStore.put('user', s.data.user);
-				Session.user = s.data.user;
-			}
-			deferred.resolve();
 		}
-
 	};
-}]);
 
+}])
+
+
+/**
+ * Authenticates routes during `resolve` phase,
+ * rejecting failures & resolving successes
+ */
+.factory('routeAuthenticator', function () {
+	return ['$q', '$route', 'Session', function ($q, $route, Session) {
+		var deferred = $q.defer();
+		if ($route.current.access.indexOf(Session.user.access) > -1) {
+			deferred.resolve();
+		} else { deferred.reject(); }
+		return deferred.promise;
+	}];
+});
 
 
 
@@ -254,7 +264,7 @@ angular.module('meany').factory('User', ['$resource', function ($resource) {
 // Source: /Users/lindgrenryan/stack/meany/app/client/angular/services/router.js
 var $router;
 
-angular.module('meany.routes')
+angular.module('meany.router')
 
 .config(['$routeProvider', function $routeProviderRef ($routeProvider) {
 	$router = $routeProvider;
@@ -326,21 +336,7 @@ angular.module('meany.routes')
 			$route.reload();
 		}
 	};
-}])
-
-/**
- * Authenticates routes during `resolve` phase,
- * rejecting failures & resolving successes
- */
-.factory('routeAuthenticator', function () {
-	return ['$q', '$route', 'Session', function ($q, $route, Session) {
-		var deferred = $q.defer();
-		if ($route.current.access.indexOf(Session.user.access) > -1) {
-			deferred.resolve();
-		} else { deferred.reject(); }
-		return deferred.promise;
-	}];
-});
+}]);
 // Source: /Users/lindgrenryan/stack/meany/app/client/angular/services/session.js
 angular.module('meany.state').factory("Session", function () {
 

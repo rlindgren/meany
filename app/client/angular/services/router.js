@@ -1,6 +1,6 @@
 var $router;
 
-angular.module('meany.routes')
+angular.module('meany.router')
 
 .config(['$routeProvider', function $routeProviderRef ($routeProvider) {
 	$router = $routeProvider;
@@ -72,18 +72,4 @@ angular.module('meany.routes')
 			$route.reload();
 		}
 	};
-}])
-
-/**
- * Authenticates routes during `resolve` phase,
- * rejecting failures & resolving successes
- */
-.factory('routeAuthenticator', function () {
-	return ['$q', '$route', 'Session', function ($q, $route, Session) {
-		var deferred = $q.defer();
-		if ($route.current.access.indexOf(Session.user.access) > -1) {
-			deferred.resolve();
-		} else { deferred.reject(); }
-		return deferred.promise;
-	}];
-});
+}]);

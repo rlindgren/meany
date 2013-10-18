@@ -147,7 +147,7 @@ module.exports = function(grunt) {
       },
       concat_js: { // concat JS files to ['public/js']
         files: ['<%= paths.angularDir %>/**/*.js'],
-        tasks: ['concat:js', 'karma:unit', 'karma:e2e'],
+        tasks: ['concat:js'],
         options: {
           force: true
         }
@@ -186,7 +186,7 @@ module.exports = function(grunt) {
             'app/client/specs/**',
             'app/server/specs/**'
           ],
-          watchedFolders: ['<%= paths.publicDir %>', '<%= paths.serverDir %>'],
+          watchedFolders: ['<%= paths.publicDir %>', '<%= paths.serverDir %>', '<%= paths.clientDir %>'],
           watchedExtensions: ['.js', '.html', '.css'],
           debug: true,
           delayTime: 1,
@@ -200,9 +200,17 @@ module.exports = function(grunt) {
 
     // Run ongoing tasks in parallel
     concurrent: {
-      tasks: ['nodemon', 'karma:unit', 'karma:e2e', 'watch'],
-      options: {
-        logConcurrentOutput: true
+      full: {
+        tasks: ['nodemon', 'karma:unit', 'karma:e2e', 'watch'],
+        options: {
+          logConcurrentOutput: true
+        }
+      },
+      nodemon_watch: {
+        tasks: ['watch', 'nodemon'],
+        options: {
+          logConcurrentOutput: true
+        }
       }
     },
 
@@ -304,11 +312,10 @@ module.exports = function(grunt) {
     'jade:html',
     'compass',
     'concat:deps', 'concat:js', 'concat:css',
-    'sass:bootstrap', 'sass:min',
+    'sass:bootstrap',
     'jshint',
     'jasmine_node',
-    'nodemon',
-    'watch:compile_scss', 'watch:concat_css'
+    'concurrent:nodemon_watch'
   ]);
 
   grunt.registerTask('noTest', [
@@ -317,10 +324,8 @@ module.exports = function(grunt) {
     'jade:html',
     'compass',
     'concat:deps', 'concat:js', 'concat:css',
-    'sass:bootstrap', 'sass:min',
+    'sass:bootstrap',
     'jshint',
-    'clean:dev',
-    'concurrent:karma:unit', 'concurrent:karma:e2e'
   ]);
 
   grunt.registerTask('test', [
