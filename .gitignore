@@ -4,5 +4,6 @@ public/css/tmp
 public/css/application.css
 public/js
 public/html
+public/lib
 app/client/lib
 .sass-cache
