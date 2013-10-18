@@ -1,5 +1,8 @@
 .DS_Store
 node_modules/
-public/
+public/css/tmp
+public/css/application.css
+public/js
+public/html
 app/client/lib
 .sass-cache
