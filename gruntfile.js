@@ -35,7 +35,7 @@ module.exports = function(grunt) {
     jade: {
       html: {
         files: {
-          "public/views": ["<%= paths.jadeDir %>/**/*.jade"]
+          "public/views": files['jade']
         },
         options: {
           basePath: "<%= paths.jadeDir %>",
@@ -138,7 +138,7 @@ module.exports = function(grunt) {
 
     watch: {
       compile_jade: { // compile to ['public/views']
-        files: ['<%= paths.jadeDir %>/**/*.jade'],
+        files: files['jade'],
         tasks: ['jade:html'],
         options: {
           spawn: false, // compile files as they change (see NOTE below)
@@ -146,28 +146,28 @@ module.exports = function(grunt) {
         }
       },
       concat_js: { // concat JS files to ['public/js']
-        files: ['<%= paths.angularDir %>/**/*.js'],
+        files: files['angular'],
         tasks: ['concat:js'],
         options: {
           force: true
         }
       },
       compile_scss: { // compile the directory to ['public/css/tmp'], then concat
-        files: ['<%= paths.sassDir %>/**/*.scss'],
+        files: files['sass'],
         tasks: ['compass'],
         options: {
           force: true
         }
       },
       concat_css: { // application.css -> ['public/css']
-        files: ['<%= paths.cssDir %>/tmp/**/*.css'],
+        files: files['css'],
         tasks: ['concat:css'],
         options: {
           force: true
         }
       },
       jasmine_node: {
-        files: ['<%= paths.serverDir %>/**/*.js', '<%= paths.serverSpecs %>/**/*.js'],
+        files: files['server'],
         tasks: ["jasmine_node"],
         options: { force: true }
       }

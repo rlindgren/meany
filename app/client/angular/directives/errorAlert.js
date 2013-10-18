@@ -2,7 +2,7 @@ angular.module('meany.auth').directive('errorAlert', function () {
 	return {
 		restrict: 'E',
 		replace: false,
-		template: '<p class="margin-none"><strong>{{errmsg}}</strong>{{err}}</p>',
+		template: '<p class="margin-none alert-error"><strong>{{errmsg}}</strong>{{err}}</p>',
 		controller: ['$scope', 'Session', function ($scope, Session) {
 			$scope.session = Session;
 			$scope.errmsg = '';

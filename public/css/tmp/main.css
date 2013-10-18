@@ -35,18 +35,23 @@
 }
 
 /* line 1, ../../../app/client/sass/_error-alert.scss */
+error-alert {
+  min-height: 49px;
+}
+
+/* line 5, ../../../app/client/sass/_error-alert.scss */
 .alert-header {
   position: relative;
   left: 0;
   right: 0;
-  top: 0%;
+  top: 21px;
   margin: 0;
   background-color: purple;
   color: white;
   display: block;
 }
 
-/* line 13, ../../../app/client/sass/_error-alert.scss */
+/* line 17, ../../../app/client/sass/_error-alert.scss */
 .alert-header.ng-hide-add,
 .alert-header.ng-hide-remove {
   -webkit-transition: all ease 0.5s;
@@ -56,18 +61,16 @@
   display: block !important;
 }
 
-/* line 22, ../../../app/client/sass/_error-alert.scss */
+/* line 26, ../../../app/client/sass/_error-alert.scss */
 .alert-header.ng-hide-remove,
 .alert-header.ng-hide-add.ng-hide-add-active {
-  line-height: 0;
-  top: -3%;
+  top: 0;
   opacity: 0;
 }
 
-/* line 29, ../../../app/client/sass/_error-alert.scss */
+/* line 32, ../../../app/client/sass/_error-alert.scss */
 .alert-header.ng-hide-add,
 .alert-header.ng-hide-remove.ng-hide-remove-active {
-  line-height: 22px;
-  top: 0%;
+  top: 21px;
   opacity: 1;
 }
