@@ -118,19 +118,19 @@ function errors (err, req, res, next) {
 }
 
 function formatErrors(err) {
-  var errObj = {}
-    , message = 'Validation failed.';
+  var errObj = {
+    message: 'Validation failed.',
+    reason: err.name || 'Reason unknown. Try again.'
+  };
+
   if (err.name === 'ValidationError') {
-    for (var k in err.errors) {
-      errObj[k + 'Error'] = err.errors[k].type + ' field.';
+    for (var k in err.error) {
+      errObj.reason = err.error[k].type + ' field.';
     }
-    return { errors: errObj, message: message };
   }
   if (err.name === 'MongoError') {
     var field = err.err.match(/\$(.*)_/)[1];
-    errObj.Error = field[0].toUpperCase() + field.slice(1) + ' is already registered.';
-    return { errors: errObj, message: message };
+    errObj.reason = field[0].toUpperCase() + field.slice(1) + ' is already registered.';
   }
-  errObj[err.name] = err.message;
-  return { errors: errObj, message: message };
+  return { error: errObj };
 }

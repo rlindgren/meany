@@ -4,6 +4,6 @@ html(lang='en', xmlns='http://www.w3.org/1999/xhtml', xmlns:fb='https://www.face
 	body
 		div(data-ng-include="'views/header.html'")
 		section.content
-			error-alert(data-ng-show="errmsg", class="alert-header pad-md lead")
+			error-alert(data-ng-show="error.message", class="alert-header pad-md lead")
 			block content
 		include ../includes/foot

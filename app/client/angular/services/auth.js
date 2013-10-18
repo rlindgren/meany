@@ -6,7 +6,7 @@ angular.module('meany.auth')
 			'responseError': function responseError (resp) {
 				var deferred = $q.defer();
 				if (resp.status === 401) {
-					$rootScope.$broadcast('Auth:loginFailed', resp);
+					$rootScope.$broadcast('Auth:loginFailed', resp.data);
 					deferred.reject(resp);
 				} else {
 					deferred.resolve(resp);
@@ -26,13 +26,13 @@ function ($q, $http, $cookieStore, $location, AuthAccess) {
 	 * @return void
 	 */
 	function _restoreState (response, sessionService) {
-		if (!response.data.errors) {
+		if (!response.data.error) {
 			if (sessionService) sessionService.user = response.data.user;
 			$cookieStore.put('user', response.data.user);
 			AuthAccess.set(response.data.user);
 			$location.path('/');
 		}
-	};
+	}
 
 	/**
 	 * sets AuthAccess and cookie user

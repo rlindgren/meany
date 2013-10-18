@@ -60,25 +60,34 @@ angular.module('meany.auth').directive('errorAlert', function () {
 	return {
 		restrict: 'E',
 		replace: false,
-		template: '<p class="margin-none alert-error"><strong>{{errmsg}}</strong>{{err}}</p>',
-		controller: ['$scope', 'Session', function ($scope, Session) {
-			$scope.session = Session;
-			$scope.errmsg = '';
-			$scope.err    = '';
-			$scope.$on('$routeChangeError', function (event, curr, prev, rejection) {
-				$scope.errmsg = 'Access denied: ';
-				$scope.err    = '"' + curr.originalPath + '" path restricted to <' +
+		template: '<p class="margin-none alert-error"><strong>{{error.message}}</strong>{{error.reason}}</p>',
+		link: function (scope, el, attrs) {
+
+			// Basic error object
+			scope.error = {
+				message: '',
+				reason: ''
+			};
+
+			/**
+			 * Define a bunch of listeners to trigger the alert.
+			 * Also, define one listener to clear the alert on successful actions.
+			 */
+			scope.$on('$routeChangeError', function (event, curr, prev, rejection) {
+				scope.error.message = 'Access denied: ';
+				scope.error.reason  = '"' + curr.originalPath + '" path restricted to <' +
 					(typeof curr.access === 'object' ? curr.access.join(', ') : curr.access) + '> access only.';
 			});
-			$scope.$on('Auth:loginFailed', function (error, response) {
-				$scope.errmsg = response.data.message + " " || 'Authentication failed: ';
-				$scope.err    = response.data.errors.Error  || 'Access denied.';
+
+			scope.$on('Auth:loginFailed', function (error, response) {
+				scope.error.message = response.error.message + " " || 'Authentication failed: ';
+				scope.error.reason  = response.error.reason  || 'Access denied.';
 			});
-			$scope.$on('$routeChangeSuccess', function () {
-				$scope.errmsg = '';
-				$scope.err    = '';
+
+			scope.$on('$routeChangeSuccess', function () {
+				scope.error = {};
 			});
-		}]
+		}
 	};
 });
 // Source: /Users/lindgrenryan/stack/meany/app/client/angular/filters/index.js
@@ -159,7 +168,7 @@ angular.module('meany.auth')
 			'responseError': function responseError (resp) {
 				var deferred = $q.defer();
 				if (resp.status === 401) {
-					$rootScope.$broadcast('Auth:loginFailed', resp);
+					$rootScope.$broadcast('Auth:loginFailed', resp.data);
 					deferred.reject(resp);
 				} else {
 					deferred.resolve(resp);
@@ -179,13 +188,13 @@ function ($q, $http, $cookieStore, $location, AuthAccess) {
 	 * @return void
 	 */
 	function _restoreState (response, sessionService) {
-		if (!response.data.errors) {
+		if (!response.data.error) {
 			if (sessionService) sessionService.user = response.data.user;
 			$cookieStore.put('user', response.data.user);
 			AuthAccess.set(response.data.user);
 			$location.path('/');
 		}
-	};
+	}
 
 	/**
 	 * sets AuthAccess and cookie user

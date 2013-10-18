@@ -59,8 +59,7 @@ function localAuth (req, res, next) {
 
 // Auth callback
 function errorCallback (err, req, res, next) {
-  console.log(401, err);
-  if (err) res.jsonp(err);
+  if (err) res.jsonp(401, err);
 }
 
 exports.signout = function (req, res) {

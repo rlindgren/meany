@@ -35,18 +35,18 @@ module.exports = function (passport, config) {
 			}
 			if (!user) {
 				return done(null, false, {
-					errors: {
-						Error: 'User not found.'
-					},
-					message: 'Authentication failed.'
+					error: {
+						reason: 'User not found.',
+						message: 'Authentication failed.'
+					}
 				});
 			}
 			if (!user.authenticate(password)) {
 				return done(null, false, {
-					errors: {
-						Error: 'Invalid password.'
-					},
-					message: 'Authentication failed.'
+					error: {
+						reason: 'Invalid password.',
+						message: 'Authentication failed.'
+					}
 				});
 			}
 			return done(null, user);
