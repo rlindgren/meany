@@ -4,14 +4,14 @@ var env = process.env.NODE_ENV || 'development'
   , path = require('path')
   , uu = require('underscore')
   , paths = require('./paths')
-  , version = JSON.parse(fs.readFileSync('package.json')).version
+  , pkg = JSON.parse(fs.readFileSync('package.json'))
   , db = require(path.join(paths.serverBootstrapDir, '/db'))[env]
   , social = require(path.join(paths.serverBootstrapDir, '/social'))[env];
 
 // expose the complete config object
 module.exports = {
-  name: 'meany',
-  version: version,
+  name: pkg.name,
+  version: pkg.version,
   env: env,
   paths: paths,
   db: db,
