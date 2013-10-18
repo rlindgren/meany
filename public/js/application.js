@@ -18,19 +18,20 @@ angular.module('meany')
 
 
 // Source: /Users/lindgrenryan/stack/meany/app/client/angular/controllers/authCtrl.js
-angular.module('meany.auth').controller('authCtrl', ['$scope', 'Auth', function ($scope, Auth) {
+angular.module('meany.auth').controller('authCtrl', [
+	'$scope', 'Auth', 'Session', function ($scope, Auth, Session) {
 
 	$scope.user = {};
 	$scope.message = 'Log in for awesomeness!';
 
-	$scope.signup = function () { Auth.signup($scope.user); };
-	$scope.signin = function () { Auth.signin($scope.user); };
+	$scope.signup = function () { Auth.signup($scope.user, Session); };
+	$scope.signin = function () { Auth.signin($scope.user, Session); };
 
 }]);
 // Source: /Users/lindgrenryan/stack/meany/app/client/angular/controllers/headerCtrl.js
 angular.module('meany').controller('headerCtrl', [
-	'$scope', '$location', 'Session', 'Auth', 'App',
-function ($scope, $location, Session, Auth, App) {
+	'$scope', '$location', 'Auth', 'Session', 'App',
+function ($scope, $location, Auth, Session, App) {
 
 	$scope.session = Session;
 	$scope.appName = App.name;
@@ -41,7 +42,7 @@ function ($scope, $location, Session, Auth, App) {
 	}];
 
 	$scope.init = function init () { };
-	$scope.signout = function () { Auth.signout(); };
+	$scope.signout = function () { Auth.signout(Session); };
 
 	$scope.isSelected = function isSelected (item) {
 		if ($location.path() === item.link) { return "active"; } return "";
@@ -96,9 +97,10 @@ $(document).ready(function() {
 
 angular.module('meany.router')
 
-.run(['Auth', 'Router', function (Auth, Router) {
-  // restore user session to client or create anonymous guest profile
-  Auth.restoreSession()
+.run(['Auth', 'Router', 'Session', function (Auth, Router, Session) {
+
+  // reset the session with custom session object (returns a promise object)
+  Auth.restoreSession(Session)
 
   // load routes, optional permissions are 3rd argument (type: Array)
   .then(function () {
@@ -169,85 +171,101 @@ angular.module('meany.auth')
 }])
 
 .factory('Auth', [
-	'$q', '$http', '$cookieStore', '$location', 'Session',
-function ($q, $http, $cookieStore, $location, Session) {
+	'$q', '$http', '$cookieStore', '$location', 'AuthAccess',
+function ($q, $http, $cookieStore, $location, AuthAccess) {
 	/**
 	 * restore state after authentication action and redirect to index path ('/')
 	 * @param  {Object} data [Server response object]
 	 * @return void
 	 */
-	var _restoreState = function _restoreState (response) {
+	function _restoreState (response, sessionService) {
 		if (!response.data.errors) {
+			if (sessionService) sessionService.user = response.data.user;
 			$cookieStore.put('user', response.data.user);
-			Session.user = response.data.user;
+			AuthAccess.set(response.data.user);
 			$location.path('/');
 		}
 	};
 
 	/**
-	 * sets Session and cookie user
+	 * sets AuthAccess and cookie user
 	 * @param {Object} serverResponse [Object returned from server]
 	 * @return void
 	 */
-	var _setCurrentUser = function _setCurrentUser (s, deferred) {
-		// `Session.user`'s state is known until this method is called in `routes.js`.
+	function _setCurrentUser (s, sessionService, deferred) {
+		// `AuthAccess.user`'s state is known until this method is called in `routes.js`.
 		// This happens during the `run` phase of app init or app state restore.
-		var u = $cookieStore.get('user') || Session.user;
+		var u = $cookieStore.get('user') || (sessionService && sessionService.user) || AuthAccess.get();
 		if (u.username && s.data.user.username && u.username === s.data.user.username) {
-			Session.user = u;
+			if (sessionService) sessionService.user = u;
+			AuthAccess.set(u);
 		} else {
 			$cookieStore.put('user', s.data.user);
-			Session.user = s.data.user;
+			if (sessionService) sessionService.user = s.data.user;
 		}
+		console.log('_setCurrentUser', sessionService);
 		deferred.resolve();
-	};
+	}
 
 	return {
 
-		signup: function (userObject) {
+		signup: function (userObject, sessionService) {
 			var deferred = $q.defer();
 			$http.post('/api/users', userObject)
-			.then(function (response) { _restoreState(response); });
+			.then(function (response) {
+				if (sessionService) _restoreState(response, sessionService);
+				else _restoreState(response);
+			});
 			return deferred.promise;
 		},
 
-		signin: function (credentials) {
+		signin: function (credentials, sessionService) {
 			var deferred = $q.defer();
 			$http.post('/auth/signin', credentials)
-			.then(function (response) { _restoreState(response); });
+			.then(function (response) {
+				if (sessionService) _restoreState(response, sessionService);
+				else _restoreState(response);
+			});
 			return deferred.promise;
 		},
 
-		signout: function () {
+		signout: function (sessionService) {
 			var deferred = $q.defer();
 			$http.get('/auth/signout')
-			.then(function (response) { _restoreState(response); });
+			.then(function (response) {
+				if (sessionService) _restoreState(response, sessionService);
+				else _restoreState(response);
+			});
 			return deferred.promise;
 		},
 
-		restoreSession: function () {
+		restoreSession: function (sessionService) {
 			var deferred = $q.defer();
 			$http.get('/auth/user')
-			.then(function (response) { _setCurrentUser(response, deferred); });
+			.then(function (response) {
+				if (sessionService) _setCurrentUser(response, sessionService, deferred);
+				else _setCurrentUser(response, null, deferred);
+			});
 			return deferred.promise;
 		}
+
 	};
 
 }])
 
-
-/**
- * Authenticates routes during `resolve` phase,
- * rejecting failures & resolving successes
- */
-.factory('routeAuthenticator', function () {
-	return ['$q', '$route', 'Session', function ($q, $route, Session) {
-		var deferred = $q.defer();
-		if ($route.current.access.indexOf(Session.user.access) > -1) {
-			deferred.resolve();
-		} else { deferred.reject(); }
-		return deferred.promise;
-	}];
+.factory('AuthAccess', function () {
+	var user = { access: 'guest' };
+	return {
+		set: function (val) {
+			user.access = val.access || 'guest';
+		},
+		get: function () {
+			return user;
+		},
+		getAccess: function () {
+			return user.access;
+		}
+	};
 });
 
 
@@ -267,10 +285,36 @@ var $router;
 angular.module('meany.router')
 
 .config(['$routeProvider', function $routeProviderRef ($routeProvider) {
-	$router = $routeProvider;
+	$router = $routeProvider; // gets reset back to null at the end of route instantiation
 }])
 
-.factory('Router', ['$route', '$location', 'routeAuthenticator', function Router ($route, $location, routeAuthenticator) {
+.factory('Router', [
+	'$route', '$location', '$injector',
+function Router ($route, $location, $injector) {
+
+	/**
+	 * Authenticates routes during `resolve` phase,
+	 * rejecting failures & resolving successes
+	 */
+	function routeAuthenticator ($q, $route) {
+		var deferred = $q.defer();
+		if (arguments[2]) {
+			if ($route.current.access.indexOf(arguments[2].getAccess()) > -1) {
+				deferred.resolve();
+			} else {
+				deferred.reject();
+			}
+		} else {
+			deferred.resolve();
+		}
+		return deferred.promise;
+	}
+
+	if ($injector.has('AuthAccess')) {
+		routeAuthenticator.$inject = ['$q', '$route', 'AuthAccess'];
+	} else {
+		routeAuthenticator.$inject = ['$q', '$route'];
+	}
 
 	/**
 	 * `addRoute` procedure for adding a single route to `$route.routes`.
@@ -280,7 +324,7 @@ angular.module('meany.router')
 	 * routes in `routes.js`.
 	 */
 	var addRoute = function addRoute (path, routeConfig, access) {
-		routeConfig = routeConfig || {}
+		routeConfig = routeConfig || {};
 		access = access || void 0;
 
 		if (!arguments.length || arguments.length < 2) {
@@ -326,6 +370,7 @@ angular.module('meany.router')
 
 		otherwise: function otherwise (routeObj) {
 			this.when(null, routeObj);
+			$router = null;
 			return this;
 		},
 

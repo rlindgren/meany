@@ -1,6 +1,6 @@
 angular.module('meany').controller('headerCtrl', [
-	'$scope', '$location', 'Session', 'Auth', 'App',
-function ($scope, $location, Session, Auth, App) {
+	'$scope', '$location', 'Auth', 'Session', 'App',
+function ($scope, $location, Auth, Session, App) {
 
 	$scope.session = Session;
 	$scope.appName = App.name;
@@ -11,7 +11,7 @@ function ($scope, $location, Session, Auth, App) {
 	}];
 
 	$scope.init = function init () { };
-	$scope.signout = function () { Auth.signout(); };
+	$scope.signout = function () { Auth.signout(Session); };
 
 	$scope.isSelected = function isSelected (item) {
 		if ($location.path() === item.link) { return "active"; } return "";

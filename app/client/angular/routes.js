@@ -2,9 +2,10 @@
 
 angular.module('meany.router')
 
-.run(['Auth', 'Router', function (Auth, Router) {
-  // restore user session to client or create anonymous guest profile
-  Auth.restoreSession()
+.run(['Auth', 'Router', 'Session', function (Auth, Router, Session) {
+
+  // reset the session with custom session object (returns a promise object)
+  Auth.restoreSession(Session)
 
   // load routes, optional permissions are 3rd argument (type: Array)
   .then(function () {

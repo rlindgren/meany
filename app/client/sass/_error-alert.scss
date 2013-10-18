@@ -6,7 +6,7 @@ error-alert {
 	position: relative;
 	left: 0;
 	right: 0;
-	top: 21px;
+	top: 0;
 	margin: 0;
 	background-color: purple;
 	color: white;
@@ -24,12 +24,10 @@ error-alert {
 
 .alert-header.ng-hide-remove,
 .alert-header.ng-hide-add.ng-hide-add-active {
-	top: 0;
-	opacity:0;
+	top: -50px;
 }
 
 .alert-header.ng-hide-add,
 .alert-header.ng-hide-remove.ng-hide-remove-active {
-	top: 21px;
-	opacity:1;
+	top: 0;
 }

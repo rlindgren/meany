@@ -3,10 +3,36 @@ var $router;
 angular.module('meany.router')
 
 .config(['$routeProvider', function $routeProviderRef ($routeProvider) {
-	$router = $routeProvider;
+	$router = $routeProvider; // gets reset back to null at the end of route instantiation
 }])
 
-.factory('Router', ['$route', '$location', 'routeAuthenticator', function Router ($route, $location, routeAuthenticator) {
+.factory('Router', [
+	'$route', '$location', '$injector',
+function Router ($route, $location, $injector) {
+
+	/**
+	 * Authenticates routes during `resolve` phase,
+	 * rejecting failures & resolving successes
+	 */
+	function routeAuthenticator ($q, $route) {
+		var deferred = $q.defer();
+		if (arguments[2]) {
+			if ($route.current.access.indexOf(arguments[2].getAccess()) > -1) {
+				deferred.resolve();
+			} else {
+				deferred.reject();
+			}
+		} else {
+			deferred.resolve();
+		}
+		return deferred.promise;
+	}
+
+	if ($injector.has('AuthAccess')) {
+		routeAuthenticator.$inject = ['$q', '$route', 'AuthAccess'];
+	} else {
+		routeAuthenticator.$inject = ['$q', '$route'];
+	}
 
 	/**
 	 * `addRoute` procedure for adding a single route to `$route.routes`.
@@ -16,7 +42,7 @@ angular.module('meany.router')
 	 * routes in `routes.js`.
 	 */
 	var addRoute = function addRoute (path, routeConfig, access) {
-		routeConfig = routeConfig || {}
+		routeConfig = routeConfig || {};
 		access = access || void 0;
 
 		if (!arguments.length || arguments.length < 2) {
@@ -62,6 +88,7 @@ angular.module('meany.router')
 
 		otherwise: function otherwise (routeObj) {
 			this.when(null, routeObj);
+			$router = null;
 			return this;
 		},
 
